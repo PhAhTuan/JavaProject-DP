@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "Product Inventory API",
+    "description": "Test collection for Product Inventory API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login Success (Admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response has token and role\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('token');",
+              "    pm.expect(jsonData).to.have.property('role');",
+              "    pm.expect(jsonData.role).to.eql('admin');",
+              "    pm.collectionVariables.set('token', jsonData.token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@system.com\",\n  \"password\": \"admin123\"\n}"
+        },
+        "url": {"raw": "http://localhost:8080/api/auth"}
+      }
+    },
+    {
+      "name": "2. Login Failure (Wrong Password)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 401\", function () {",
+              "    pm.response.to.have.status(401);",
+              "});",
+              "",
+              "pm.test(\"Error response format\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('errorCode');",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "    pm.expect(jsonData.errorCode).to.eql('PR40101');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@system.com\",\n  \"password\": \"wrongpass\"\n}"
+        },
+        "url": {"raw": "http://localhost:8080/api/auth"}
+      }
+    },
+    {
+      "name": "3. Get All Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is array\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "http://localhost:8080/api/products"}
+      }
+    },
+    {
+      "name": "4. Add Product (Manager)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Product created\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('productId');",
+              "    pm.expect(jsonData.productName).to.eql('Test Product ABC');",
+              "    pm.collectionVariables.set('productId', jsonData.productId);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productName\": \"Test Product ABC\",\n  \"price\": 99.99,\n  \"quantity\": 50,\n  \"categoryId\": 1,\n  \"material\": \"Plastic\"\n}"
+        },
+        "url": {"raw": "http://localhost:8080/api/products"}
+      }
+    },
+    {
+      "name": "5. Update Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Product updated\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.price).to.eql(149.99);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productName\": \"Test Product ABC Updated\",\n  \"price\": 149.99,\n  \"quantity\": 75,\n  \"categoryId\": 2,\n  \"material\": \"Metal\"\n}"
+        },
+        "url": {"raw": "http://localhost:8080/api/products/{{productId}}"}
+      }
+    },
+    {
+      "name": "6. Delete Product (Admin Only)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "http://localhost:8080/api/products/{{productId}}"}
+      }
+    },
+    {
+      "name": "7. Search Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is grouped by category\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('object');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "http://localhost:8080/api/products/search?name=Smart&category="}
+      }
+    },
+    {
+      "name": "8. Get Product By ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Product found\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('productId');",
+              "    pm.expect(jsonData.productId).to.eql(1);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"}
+        ],
+        "url": {"raw": "http://localhost:8080/api/products/1"}
+      }
+    }
+  ],
+  "variable": [
+    {"key": "token", "value": ""},
+    {"key": "productId", "value": ""}
+  ]
+}

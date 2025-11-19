@@ -1,10 +1,8 @@
--- Run this SQL in MySQL Workbench BEFORE starting the application
-
 DROP DATABASE IF EXISTS spring2025productinventorydb;
 CREATE DATABASE spring2025productinventorydb;
 USE spring2025productinventorydb;
 
--- Table: SystemAccounts
+-- Tạo bảng systemaccounts
 CREATE TABLE SystemAccounts (
     AccountID INT PRIMARY KEY,
     Username VARCHAR(100) NOT NULL,
@@ -14,14 +12,14 @@ CREATE TABLE SystemAccounts (
     IsActive BOOLEAN DEFAULT TRUE
 );
 
--- Table: Category
+-- Tạo bảng category
 CREATE TABLE Category (
     CategoryID INT PRIMARY KEY,
     CategoryName VARCHAR(255) NOT NULL,
     Description VARCHAR(500)
 );
 
--- Table: Product
+-- Tạo bảng product
 CREATE TABLE Product (
     ProductID INT PRIMARY KEY AUTO_INCREMENT,
     CategoryID INT,
@@ -34,7 +32,7 @@ CREATE TABLE Product (
         REFERENCES Category(CategoryID) ON DELETE CASCADE
 );
 
--- Sample Data: SystemAccounts
+-- Nhập dữ liệu mẫu: SystemAccounts
 INSERT INTO SystemAccounts (AccountID, Username, Email, Password, Role, IsActive) VALUES
 (1, 'adminpro', 'admin@system.com', 'admin123', 1, TRUE),
 (2, 'manager1', 'manager@system.com', 'manager123', 2, TRUE),
@@ -42,7 +40,7 @@ INSERT INTO SystemAccounts (AccountID, Username, Email, Password, Role, IsActive
 (4, 'user1', 'user1@system.com', 'user123', 4, TRUE),
 (5, 'suspended', 'blocked@system.com', 'nopass', 2, FALSE);
 
--- Sample Data: Category
+-- Nhập dữ liệu mẫu: Category
 INSERT INTO Category (CategoryID, CategoryName, Description) VALUES
 (1, 'Electronics', 'Electronic devices and accessories'),
 (2, 'Wearables', 'Smartwatches, fitness bands'),
@@ -50,7 +48,7 @@ INSERT INTO Category (CategoryID, CategoryName, Description) VALUES
 (4, 'Books', 'Printed and digital books'),
 (5, 'Gaming', 'Consoles, accessories and titles');
 
--- Sample Data: Product (Reset AUTO_INCREMENT start from 1)
+-- Nhập dữ liệu mẫu: Product 
 ALTER TABLE Product AUTO_INCREMENT = 1;
 INSERT INTO Product (CategoryID, ProductName, Material, Price, Quantity, ReleaseDate) VALUES
 (1, 'Wireless Earbuds Pro', 'Plastic', 199.99, 100, '2024-01-15'),
